@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Droplets, Layers, Scissors, Hash, RotateCw, Image as ImageIcon,
-  Trash2, DownloadCloud, Type, FileOutput, RefreshCw, Crop, Lock, ChevronDown, Moon, Sun, ShieldCheck, Zap, Menu, X, User, Eraser, FileText, Search
+  Trash2, Type, FileOutput, RefreshCw, Crop, Lock, ChevronDown, Moon, Sun, ShieldCheck, Zap, Menu, X, User, Eraser, FileText, Search
 } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 
@@ -165,7 +165,6 @@ function ScrollToTop() {
 }
 
 function App() {
-  const [installPrompt, setInstallPrompt] = React.useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [isDarkMode, setIsDarkMode] = React.useState(() => {
     return localStorage.getItem('theme') === 'dark' || false;
@@ -182,14 +181,6 @@ function App() {
       localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
-
-
-  React.useEffect(() => {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      setInstallPrompt(e);
-    });
-  }, []);
 
   React.useEffect(() => {
     const path = location.pathname;
@@ -425,16 +416,6 @@ function App() {
     }
     script.text = JSON.stringify(schemaData);
   }, [location.pathname]);
-
-  const handleInstall = async () => {
-    if (!installPrompt) return;
-    installPrompt.prompt();
-    const { outcome } = await installPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setInstallPrompt(null);
-    }
-  };
-
 
   const homeFaqs = [
     {
@@ -762,13 +743,6 @@ function App() {
           >
             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
-
-          {installPrompt && (
-            <button className="install-btn" onClick={handleInstall}>
-              <DownloadCloud size={18} />
-              <span>Install App</span>
-            </button>
-          )}
 
           <SignedOut>
             <SignInButton mode="modal" fallbackRedirectUrl={location.pathname} signUpFallbackRedirectUrl={location.pathname}>
