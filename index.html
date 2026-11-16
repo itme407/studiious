@@ -59,10 +59,40 @@
   </script>
   <meta name="p:domain_verify" content="32362b46d181e0ff48cde3adbff87386"/>
   <meta name="msvalidate.01" content="E163F1AF444743C85782C1A89D1C49BA" />
+  <script>
+    (function() {
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 
 <body>
   <div id="root">
+    <div id="app-loading" style="min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <img src="/logo.png" alt="SealPDF" style="height: 44px; width: auto; object-fit: contain;" />
+        <div class="sealpdf-loader" style="width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #2563EB; border-radius: 50%; animation: sealpdf-spin 0.75s linear infinite;"></div>
+      </div>
+      <style>
+        @keyframes sealpdf-spin {
+          to { transform: rotate(360deg); }
+        }
+        html.dark #app-loading {
+          background-color: #212121 !important;
+        }
+        html.dark #app-loading .sealpdf-loader {
+          border-color: #404040 !important;
+          border-top-color: #3b82f6 !important;
+        }
+      </style>
+    </div>
+  </div>
+  <noscript>
     <header style="padding: 2rem; text-align: center;">
       <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">SealPDF — Free, Fast & Private PDF Toolkit</h1>
       <p style="color: #64748b;">Professional browser-based PDF utilities: Watermark, Merge, Split, Compress & Protect.</p>
@@ -99,7 +129,7 @@
     <footer style="text-align: center; padding: 2rem; color: #64748b; border-top: 1px solid #e2e8f0;">
       <p>&copy; 2026 SealPDF. All rights reserved. <a href="/privacy">Privacy Policy</a> | <a href="/terms">Terms of Service</a> | <a href="/about">About Us</a> | <a href="/contact">Contact Us</a> | <a href="/guides">Guides & Resources</a></p>
     </footer>
-  </div>
+  </noscript>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

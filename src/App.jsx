@@ -517,8 +517,8 @@ function App() {
       <>
         <section className="home-hero">
           <div className="hero-badges">
-            <div className="hero-badge"><ShieldCheck size={16} /> 100% Secure & Private</div>
-            <div className="hero-badge"><Zap size={16} /> No File Size Limits</div>
+            <div className="hero-badge"><ShieldCheck size={15} /> 100% Secure & Private</div>
+            <div className="hero-badge"><Zap size={15} /> No File Size Limits</div>
           </div>
           <h1>Simplify your PDF workflow with everything in one spot</h1>
           <p>Powerful PDF tools made simple and free. Merge, split, compress, convert, rotate, unlock, and watermark your PDFs with just a few clicks.</p>
@@ -593,7 +593,7 @@ function App() {
                   {category.tools.map(tool => (
                     <Link key={tool.path} to={tool.path} className="tool-card">
                       <div className="tool-icon-wrapper">
-                        {React.cloneElement(tool.icon, { size: 48 })}
+                        {React.cloneElement(tool.icon, { size: 44 })}
                       </div>
                       <h3>{tool.name}</h3>
                       <p>{tool.desc}</p>
