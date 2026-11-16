@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Droplets, Layers, Scissors, Hash, RotateCw, Image as ImageIcon,
-  Trash2, DownloadCloud, Type, FileOutput, RefreshCw, Crop, Lock, ChevronDown, Moon, Sun, ShieldCheck, Zap, Menu, X, User, Eraser, FileText
+  Trash2, DownloadCloud, Type, FileOutput, RefreshCw, Crop, Lock, ChevronDown, Moon, Sun, ShieldCheck, Zap, Menu, X, User, Eraser, FileText, Search
 } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 
@@ -38,6 +38,27 @@ import GuideDetail from './components/GuideDetail';
 import HelpCenter from './components/HelpCenter';
 import { guidesData } from './data/guidesData';
 import { toolMarketingData } from './data/toolMarketingData';
+
+// Dpdf.com vector icons
+import {
+  MergePdfIcon,
+  SplitPdfIcon,
+  CompressPdfIcon,
+  RemovePagesIcon,
+  ExtractPagesIcon,
+  OrganizePdfIcon,
+  PdfToWordIcon,
+  ImagesToPdfIcon,
+  PdfToImagesIcon,
+  RotatePdfIcon,
+  AddWatermarkIcon,
+  RemoveWatermarkIcon,
+  CropPdfIcon,
+  ProtectPdfIcon,
+  EditPdfIcon,
+  PageNumbersIcon,
+  RedactPdfIcon
+} from './components/DpdfIcons';
 
 const pathToMarketingKey = {
   '/merge-pdf': 'merge',
@@ -82,45 +103,50 @@ const toolKeywords = {
 
 const categories = [
   {
+    id: 'organize',
     title: "ORGANIZE PDF",
     tools: [
-      { path: '/merge-pdf', name: 'Merge PDF', desc: 'Combine PDFs in the order you want with the easiest PDF merger.', icon: <Layers />, component: MergerTool },
-      { path: '/split-pdf', name: 'Split PDF', desc: 'Separate one page or a whole set for easy conversion.', icon: <Scissors />, component: SplitterTool },
-      { path: '/remove-pages', name: 'Remove pages', desc: 'Remove pages from a PDF document. Select and remove the pages.', icon: <Trash2 />, component: PageRemoverTool },
-      { path: '/extract-pages', name: 'Extract pages', desc: 'Extract specific pages from a PDF to form a new document.', icon: <FileOutput />, component: ExtractPagesTool },
-      { path: '/organize-pdf', name: 'Organize PDF', desc: 'Sort, change order, or delete PDF pages easily.', icon: <RefreshCw />, component: OrganizePdfTool },
-      { path: '/compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while optimizing for maximal PDF quality.', icon: <DownloadCloud />, component: CompressPdfTool },
+      { path: '/merge-pdf', name: 'Merge PDF', desc: 'Combine PDFs in the order you want with the easiest PDF merger.', icon: <MergePdfIcon />, component: MergerTool },
+      { path: '/split-pdf', name: 'Split PDF', desc: 'Separate one page or a whole set for easy conversion.', icon: <SplitPdfIcon />, component: SplitterTool },
+      { path: '/remove-pages', name: 'Remove pages', desc: 'Remove pages from a PDF document. Select and remove the pages.', icon: <RemovePagesIcon />, component: PageRemoverTool },
+      { path: '/extract-pages', name: 'Extract pages', desc: 'Extract specific pages from a PDF to form a new document.', icon: <ExtractPagesIcon />, component: ExtractPagesTool },
+      { path: '/organize-pdf', name: 'Organize PDF', desc: 'Sort, change order, or delete PDF pages easily.', icon: <OrganizePdfIcon />, component: OrganizePdfTool },
+      { path: '/compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while optimizing for maximal PDF quality.', icon: <CompressPdfIcon />, component: CompressPdfTool },
     ]
   },
   {
+    id: 'convert-to',
     title: "CONVERT TO PDF",
     tools: [
-      { path: '/jpg-to-pdf', name: 'JPG to PDF', desc: 'Convert JPG images to PDF in seconds. Easily adjust orientation and margins.', icon: <ImageIcon />, component: ImageToPdfTool },
+      { path: '/jpg-to-pdf', name: 'JPG to PDF', desc: 'Convert JPG images to PDF in seconds. Easily adjust orientation and margins.', icon: <ImagesToPdfIcon />, component: ImageToPdfTool },
     ]
   },
   {
+    id: 'convert-from',
     title: "CONVERT FROM PDF",
     tools: [
-      { path: '/pdf-to-jpg', name: 'PDF to JPG', desc: 'Convert each PDF page into a JPG or extract all images contained in a PDF.', icon: <ImageIcon />, component: PdfToJpgTool },
-      { path: '/pdf-to-word', name: 'PDF to Word', desc: 'Convert PDF documents to editable Word files with high accuracy.', icon: <FileText />, component: PdfToWordTool },
+      { path: '/pdf-to-jpg', name: 'PDF to JPG', desc: 'Convert each PDF page into a JPG or extract all images contained in a PDF.', icon: <PdfToImagesIcon />, component: PdfToJpgTool },
+      { path: '/pdf-to-word', name: 'PDF to Word', desc: 'Convert PDF documents to editable Word files with high accuracy.', icon: <PdfToWordIcon />, component: PdfToWordTool },
     ]
   },
   {
+    id: 'edit',
     title: "EDIT PDF",
     tools: [
-      { path: '/rotate-pdf', name: 'Rotate PDF', desc: 'Rotate your PDFs the way you need them.', icon: <RotateCw />, component: PageRotatorTool },
-      { path: '/page-numbers', name: 'Add page numbers', desc: 'Add page numbers into PDFs with ease. Choose your positions and dimensions.', icon: <Hash />, component: PageNumbererTool },
-      { path: '/watermark-pdf', name: 'Add watermark', desc: 'Stamp an image or text over your PDF in seconds.', icon: <Droplets />, component: WatermarkTool },
-      { path: '/crop-pdf', name: 'Crop PDF', desc: 'Crop PDF margins, change PDF page size.', icon: <Crop />, component: CropPdfTool },
-      { path: '/edit-pdf', name: 'Edit PDF', desc: 'Add text, images, shapes or freehand annotations to a PDF document.', icon: <Type />, component: EditorTool },
-      { path: '/remove-watermark', name: 'Remove Watermark', desc: 'True watermark removal: identifies and deletes recurring objects from PDF data.', icon: <Eraser />, component: WatermarkRemoverTool },
+      { path: '/rotate-pdf', name: 'Rotate PDF', desc: 'Rotate your PDFs the way you need them.', icon: <RotatePdfIcon />, component: PageRotatorTool },
+      { path: '/page-numbers', name: 'Add page numbers', desc: 'Add page numbers into PDFs with ease. Choose your positions and dimensions.', icon: <PageNumbersIcon />, component: PageNumbererTool },
+      { path: '/watermark-pdf', name: 'Add watermark', desc: 'Stamp an image or text over your PDF in seconds.', icon: <AddWatermarkIcon />, component: WatermarkTool },
+      { path: '/crop-pdf', name: 'Crop PDF', desc: 'Crop PDF margins, change PDF page size.', icon: <CropPdfIcon />, component: CropPdfTool },
+      { path: '/edit-pdf', name: 'Edit PDF', desc: 'Add text, images, shapes or freehand annotations to a PDF document.', icon: <EditPdfIcon />, component: EditorTool },
+      { path: '/remove-watermark', name: 'Remove Watermark', desc: 'True watermark removal: identifies and deletes recurring objects from PDF data.', icon: <RemoveWatermarkIcon />, component: WatermarkRemoverTool },
     ]
   },
   {
+    id: 'security',
     title: "PDF SECURITY",
     tools: [
-      { path: '/protect-pdf', name: 'Protect PDF', desc: 'Encrypt your PDF with a password to prevent unauthorized access.', icon: <Lock />, component: ProtectPdfTool },
-      { path: '/redact-pdf', name: 'Redact PDF', desc: 'Permanently hide and blackout sensitive text and images.', icon: <Type />, component: RedactPdfTool },
+      { path: '/protect-pdf', name: 'Protect PDF', desc: 'Encrypt your PDF with a password to prevent unauthorized access.', icon: <ProtectPdfIcon />, component: ProtectPdfTool },
+      { path: '/redact-pdf', name: 'Redact PDF', desc: 'Permanently hide and blackout sensitive text and images.', icon: <RedactPdfIcon />, component: RedactPdfTool },
     ]
   }
 ];
@@ -434,36 +460,150 @@ function App() {
   ];
 
   const [openHomeFaq, setOpenHomeFaq] = useState(null);
+  const [activeCategoryTab, setActiveCategoryTab] = useState('all');
+  const [toolSearchQuery, setToolSearchQuery] = useState('');
 
-  const renderHome = () => (
-    <>
-      <section className="home-hero">
-        <div className="hero-badges">
-          <div className="hero-badge"><ShieldCheck size={16} /> 100% Secure & Private</div>
-          <div className="hero-badge"><Zap size={16} /> No File Size Limits</div>
-        </div>
-        <h1>Simplify your PDF workflow with everything in one spot</h1>
-        <p>Powerful PDF tools made simple and free. Merge, split, compress, convert, rotate, unlock, and watermark your PDFs with just a few clicks.</p>
-      </section>
+  const filterTabs = [
+    { id: 'all', label: 'All Tools' },
+    { id: 'organize', label: 'Organize PDF' },
+    { id: 'convert', label: 'Convert PDF' },
+    { id: 'edit', label: 'Edit PDF' },
+    { id: 'security', label: 'PDF Security' },
+  ];
 
-      <div className="tools-grid-container" style={{ paddingTop: '2rem' }}>
-        {categories.map((category, index) => (
-          <div key={index} style={{ marginBottom: '4rem' }}>
-            <h2 style={{ fontSize: '1.4rem', color: 'var(--text-muted)', marginBottom: '1.5rem', borderBottom: '2px solid var(--border-color)', paddingBottom: '0.5rem', fontWeight: 700 }}>{category.title}</h2>
-            <div className="tools-grid">
-              {category.tools.map(tool => (
-                <Link key={tool.path} to={tool.path} className="tool-card">
-                  <div className="tool-icon-wrapper">
-                    {React.cloneElement(tool.icon, { size: 48, strokeWidth: 1.5 })}
-                  </div>
-                  <h3>{tool.name}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.4' }}>{tool.desc}</p>
-                </Link>
-              ))}
+  const formatCategoryTitle = (title) => {
+    if (title === 'PDF SECURITY') return 'PDF Security';
+    return title
+      .toLowerCase()
+      .split(' ')
+      .map(word => {
+        if (word === 'pdf') return 'PDF';
+        if (word === 'to' || word === 'from') return word;
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(' ');
+  };
+
+  const getFilteredCategories = () => {
+    let cats = categories;
+    if (activeCategoryTab === 'organize') {
+      cats = categories.filter(c => c.id === 'organize');
+    } else if (activeCategoryTab === 'convert') {
+      cats = categories.filter(c => c.id === 'convert-to' || c.id === 'convert-from');
+    } else if (activeCategoryTab === 'edit') {
+      cats = categories.filter(c => c.id === 'edit');
+    } else if (activeCategoryTab === 'security') {
+      cats = categories.filter(c => c.id === 'security');
+    }
+
+    if (!toolSearchQuery.trim()) return cats;
+
+    const query = toolSearchQuery.toLowerCase().trim();
+    return cats
+      .map(cat => ({
+        ...cat,
+        tools: cat.tools.filter(tool =>
+          tool.name.toLowerCase().includes(query) ||
+          tool.desc.toLowerCase().includes(query)
+        )
+      }))
+      .filter(cat => cat.tools.length > 0);
+  };
+
+  const renderHome = () => {
+    const displayedCategories = getFilteredCategories();
+
+    return (
+      <>
+        <section className="home-hero">
+          <div className="hero-badges">
+            <div className="hero-badge"><ShieldCheck size={16} /> 100% Secure & Private</div>
+            <div className="hero-badge"><Zap size={16} /> No File Size Limits</div>
+          </div>
+          <h1>Simplify your PDF workflow with everything in one spot</h1>
+          <p>Powerful PDF tools made simple and free. Merge, split, compress, convert, rotate, unlock, and watermark your PDFs with just a few clicks.</p>
+        </section>
+
+        <div className="tools-grid-container">
+          {/* Controls: Search & Category Tabs */}
+          <div className="tools-controls">
+            <div className="tools-search-wrapper">
+              <Search size={18} className="tools-search-icon" />
+              <input
+                type="text"
+                className="tools-search-input"
+                placeholder="Search PDF tools (e.g. merge, compress, watermark)..."
+                value={toolSearchQuery}
+                onChange={(e) => setToolSearchQuery(e.target.value)}
+              />
+              {toolSearchQuery && (
+                <button
+                  className="tools-search-clear"
+                  onClick={() => setToolSearchQuery('')}
+                  title="Clear search"
+                  type="button"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+
+            <div className="category-tabs-wrapper">
+              <div className="category-tabs">
+                {filterTabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    className={`category-tab-btn ${activeCategoryTab === tab.id ? 'active' : ''}`}
+                    onClick={() => setActiveCategoryTab(tab.id)}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Categories / Tools List */}
+          {displayedCategories.length === 0 ? (
+            <div className="tools-empty-search">
+              <p>No PDF tools found matching "<strong>{toolSearchQuery}</strong>"</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setToolSearchQuery('');
+                  setActiveCategoryTab('all');
+                }}
+              >
+                View All Tools
+              </button>
+            </div>
+          ) : (
+            displayedCategories.map((category, index) => (
+              <div key={category.id || index} className="category-section">
+                {(activeCategoryTab === 'all' || toolSearchQuery.trim() !== '') && (
+                  <div className="category-header">
+                    <h2 className="category-title">{formatCategoryTitle(category.title)}</h2>
+                    <span className="category-count">
+                      {category.tools.length} {category.tools.length === 1 ? 'tool' : 'tools'}
+                    </span>
+                  </div>
+                )}
+                <div className="tools-grid">
+                  {category.tools.map(tool => (
+                    <Link key={tool.path} to={tool.path} className="tool-card">
+                      <div className="tool-icon-wrapper">
+                        {React.cloneElement(tool.icon, { size: 48 })}
+                      </div>
+                      <h3>{tool.name}</h3>
+                      <p>{tool.desc}</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
       <section className="home-rich-content" style={{ marginTop: '4rem', borderTop: '1px solid var(--border-color)', paddingTop: '4rem' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto', color: 'var(--text-main)', lineHeight: 1.7 }}>
@@ -567,6 +707,7 @@ function App() {
       </section>
     </>
   );
+};
 
   return (
     <div className="app-shell">
