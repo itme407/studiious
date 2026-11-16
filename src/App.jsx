@@ -39,7 +39,7 @@ import HelpCenter from './components/HelpCenter';
 import { guidesData } from './data/guidesData';
 import { toolMarketingData } from './data/toolMarketingData';
 
-// Dpdf.com vector icons
+//  vector icons
 import {
   MergePdfIcon,
   SplitPdfIcon,

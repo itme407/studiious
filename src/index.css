@@ -423,7 +423,7 @@ body {
   margin: 0 auto;
 }
 
-/* Tools Filter & Search Controls (dpdf.com style) */
+/* Tools Filter & Search Controls */
 .tools-controls {
   display: flex;
   flex-direction: column;
@@ -570,7 +570,7 @@ body {
   padding: 0 1.5rem;
 }
 
-/* 4-column Grid matching dpdf.com */
+/* 4-column Grid matching  */
 .tools-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -598,7 +598,7 @@ body {
   }
 }
 
-/* Tool Card matching dpdf.com */
+/* Tool Card matching*/
 .tool-card {
   background: var(--bg-white);
   border: 1px solid #edf2f7;

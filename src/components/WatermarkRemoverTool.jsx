@@ -955,7 +955,7 @@ const WatermarkRemoverTool = () => {
                                 <p className="upload-subtext" style={{ fontSize: '0.95rem' }}>or drag & drop PDF here</p>
                                 <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                                     <span style={{ fontSize: '0.78rem', padding: '0.2rem 0.6rem', background: 'rgba(37, 99, 235, 0.08)', borderRadius: '12px', color: 'var(--primary)', fontWeight: 600 }}>
-                                        ⚡ Dpdf Stubborn Cleaner Enabled
+                                        ⚡ Stubborn Cleaner Enabled
                                     </span>
                                 </div>
                                 <input type="file" id="remove-upload" hidden accept=".pdf" onChange={onFileChange} />
@@ -1220,7 +1220,7 @@ const WatermarkRemoverTool = () => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
                         <ShieldCheck size={22} style={{ color: 'var(--primary)' }} />
                         <div>
-                            <h3 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 700 }}>Dpdf Watermark Cleaner</h3>
+                            <h3 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 700 }}>Watermark Cleaner</h3>
                             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0 }}>Smart Multi-Engine Stubborn Watermark Stripper</p>
                         </div>
                     </div>
