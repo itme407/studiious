@@ -12,6 +12,7 @@ export default defineConfig({
         /^\/sitemap\.xml$/,
         /^\/robots\.txt$/,
         /^\/ads\.txt$/,
+        /^\/BingSiteAuth\.xml$/,
         /^\/googleed8f3eaef53d5729\.html$/
       ]
     },

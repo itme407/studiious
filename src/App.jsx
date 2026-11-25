@@ -1,41 +1,38 @@
-import React, { useState } from 'react';
-import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, lazy, Suspense } from 'react';
+import { Routes, Route, Link, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import {
-  Droplets, Layers, Scissors, Hash, RotateCw, Image as ImageIcon,
-  Trash2, Type, FileOutput, RefreshCw, Crop, Lock, ChevronDown, Moon, Sun, ShieldCheck, Zap, Menu, X, User, Eraser, FileText, Search
+  ChevronDown, Moon, Sun, ShieldCheck, Zap, Menu, X, User, Search
 } from 'lucide-react';
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/clerk-react';
 
-// Original Tools
-import WatermarkTool from './components/WatermarkTool';
-import MergerTool from './components/MergerTool';
-import SplitterTool from './components/SplitterTool';
-import PageNumbererTool from './components/PageNumbererTool';
-import PageRotatorTool from './components/PageRotatorTool';
-import ImageToPdfTool from './components/ImageToPdfTool';
-import PageRemoverTool from './components/PageRemoverTool';
-import EditorTool from './components/EditorTool';
-
-// New Feasible Tools
-import ProtectPdfTool from './components/ProtectPdfTool';
-import PdfToJpgTool from './components/PdfToJpgTool';
-import ExtractPagesTool from './components/ExtractPagesTool';
-import OrganizePdfTool from './components/OrganizePdfTool';
-import CropPdfTool from './components/CropPdfTool';
-import CompressPdfTool from './components/CompressPdfTool';
-import RedactPdfTool from './components/RedactPdfTool';
-import WatermarkRemoverTool from './components/WatermarkRemoverTool';
+// Lazy-loaded Tools for Code Splitting & Core Web Vitals
+const WatermarkTool = lazy(() => import('./components/WatermarkTool'));
+const MergerTool = lazy(() => import('./components/MergerTool'));
+const SplitterTool = lazy(() => import('./components/SplitterTool'));
+const PageNumbererTool = lazy(() => import('./components/PageNumbererTool'));
+const PageRotatorTool = lazy(() => import('./components/PageRotatorTool'));
+const ImageToPdfTool = lazy(() => import('./components/ImageToPdfTool'));
+const PageRemoverTool = lazy(() => import('./components/PageRemoverTool'));
+const EditorTool = lazy(() => import('./components/EditorTool'));
+const ProtectPdfTool = lazy(() => import('./components/ProtectPdfTool'));
+const PdfToJpgTool = lazy(() => import('./components/PdfToJpgTool'));
+const ExtractPagesTool = lazy(() => import('./components/ExtractPagesTool'));
+const OrganizePdfTool = lazy(() => import('./components/OrganizePdfTool'));
+const CropPdfTool = lazy(() => import('./components/CropPdfTool'));
+const CompressPdfTool = lazy(() => import('./components/CompressPdfTool'));
+const RedactPdfTool = lazy(() => import('./components/RedactPdfTool'));
+const WatermarkRemoverTool = lazy(() => import('./components/WatermarkRemoverTool'));
+const PdfToWordTool = lazy(() => import('./components/PdfToWordTool'));
 
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TermsOfService from './components/TermsOfService';
-import AboutUs from './components/AboutUs';
-import ContactUs from './components/ContactUs';
-import PdfToWordTool from './components/PdfToWordTool';
-import GuidesList from './components/GuidesList';
-import GuideDetail from './components/GuideDetail';
-import HelpCenter from './components/HelpCenter';
+const PrivacyPolicy = lazy(() => import('./components/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./components/TermsOfService'));
+const AboutUs = lazy(() => import('./components/AboutUs'));
+const ContactUs = lazy(() => import('./components/ContactUs'));
+const GuidesList = lazy(() => import('./components/GuidesList'));
+const GuideDetail = lazy(() => import('./components/GuideDetail'));
+const HelpCenter = lazy(() => import('./components/HelpCenter'));
 import { guidesData } from './data/guidesData';
 import { toolMarketingData } from './data/toolMarketingData';
 
@@ -190,11 +187,15 @@ function App() {
     let canonical = `https://seal-pdf.com${path === '/' ? '' : path}`;
     
     let schemaData = null;
+    let isKnownRoute = false;
     
     // Check if path is a tool route
     const marketingKey = pathToMarketingKey[path];
     if (marketingKey && toolMarketingData[marketingKey]) {
+      isKnownRoute = true;
       const toolData = toolMarketingData[marketingKey];
+      const matchedTool = allTools.find(t => t.path === path);
+      const toolName = matchedTool ? matchedTool.name : toolData.title.split(' — ')[0];
       title = `${toolData.title} | SealPDF`;
       description = toolData.description;
       keywords = toolKeywords[marketingKey] || keywords;
@@ -202,12 +203,10 @@ function App() {
       // Build tool-specific schemas
       const url = `https://seal-pdf.com${path}`;
       
-      // WebApplication Schema
       const webAppSchema = {
-        "@context": "https://schema.org",
         "@type": "WebApplication",
         "@id": `${url}#webapp`,
-        "name": `SealPDF - ${toolData.title.split(' — ')[0]}`,
+        "name": `SealPDF - ${toolName}`,
         "url": url,
         "description": toolData.description,
         "applicationCategory": "BusinessApplication",
@@ -220,24 +219,21 @@ function App() {
         }
       };
 
-      // HowTo Schema
       const howToSchema = {
-        "@context": "https://schema.org",
         "@type": "HowTo",
         "@id": `${url}#howto`,
-        "name": `How to use SealPDF ${toolData.title.split(' — ')[0]}`,
+        "name": `How to ${toolName} Online Free`,
         "description": `Step-by-step guide to ${toolData.title.toLowerCase()} online for free.`,
         "step": toolData.steps.map((step, idx) => ({
           "@type": "HowToStep",
+          "position": idx + 1,
           "url": `${url}#step-${idx + 1}`,
           "name": step.title,
           "text": step.text
         }))
       };
 
-      // FAQPage Schema
       const faqSchema = {
-        "@context": "https://schema.org",
         "@type": "FAQPage",
         "@id": `${url}#faq`,
         "mainEntity": toolData.faqs.map(faq => ({
@@ -250,45 +246,128 @@ function App() {
         }))
       };
 
+      const breadcrumbSchema = {
+        "@type": "BreadcrumbList",
+        "@id": `${url}#breadcrumb`,
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://seal-pdf.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": toolName,
+            "item": url
+          }
+        ]
+      };
+
       schemaData = {
         "@context": "https://schema.org",
-        "@graph": [webAppSchema, howToSchema, faqSchema]
+        "@graph": [webAppSchema, howToSchema, faqSchema, breadcrumbSchema]
       };
     } else {
       // Non-tool pages
-      if (path === '/about') {
+      if (path === '/') {
+        isKnownRoute = true;
+        schemaData = {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "@id": "https://seal-pdf.com/#website",
+              "name": "SealPDF",
+              "url": "https://seal-pdf.com/",
+              "description": description
+            },
+            {
+              "@type": "Organization",
+              "@id": "https://seal-pdf.com/#organization",
+              "name": "SealPDF",
+              "url": "https://seal-pdf.com/",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://seal-pdf.com/logo.png"
+              }
+            },
+            {
+              "@type": "ItemList",
+              "@id": "https://seal-pdf.com/#tools",
+              "name": "SealPDF Online PDF Tools",
+              "itemListElement": allTools.map((t, idx) => ({
+                "@type": "ListItem",
+                "position": idx + 1,
+                "name": t.name,
+                "url": `https://seal-pdf.com${t.path}`
+              }))
+            },
+            {
+              "@type": "FAQPage",
+              "@id": "https://seal-pdf.com/#faq",
+              "mainEntity": homeFaqs.map(faq => ({
+                "@type": "Question",
+                "name": faq.q,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.a
+                }
+              }))
+            }
+          ]
+        };
+      } else if (path === '/about') {
+        isKnownRoute = true;
         title = "About Us | SealPDF";
         description = "Learn more about SealPDF, our mission, values, and how we build secure, browser-based tools to simplify your PDF workflow.";
         keywords = "about us, PDF toolkit story, free PDF mission, SealPDF";
       } else if (path === '/contact') {
+        isKnownRoute = true;
         title = "Contact Us | SealPDF";
         description = "Get in touch with the SealPDF team for support, feature requests, or general inquiries.";
         keywords = "contact, support, feedback, PDF tool help, SealPDF";
       } else if (path === '/privacy') {
+        isKnownRoute = true;
         title = "Privacy Policy | SealPDF";
         description = "Read our privacy policy to understand how we protect your files and personal information. Complete local browser safety.";
         keywords = "privacy policy, data security, PDF privacy, SealPDF";
       } else if (path === '/terms') {
+        isKnownRoute = true;
         title = "Terms of Service | SealPDF";
         description = "Read the SealPDF Terms of Service. Understand our usage conditions and security commitments.";
         keywords = "terms of service, user agreement, PDF tools terms, SealPDF";
       } else if (path === '/guides') {
+        isKnownRoute = true;
         title = "Guides & Resources | SealPDF";
         description = "Read our expert-written, comprehensive PDF guides. Learn about password protection, document watermarks, compression efficiency, layout integrity, and GDPR compliance.";
         keywords = "PDF guides, how-to PDF, password protect guide, compress PDF guide, document safety, GDPR compliance PDF";
         
         schemaData = {
           "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          "@id": "https://seal-pdf.com/guides#collection",
-          "name": "SealPDF Guides & Technical Resources",
-          "url": "https://seal-pdf.com/guides",
-          "description": "Educational articles, guides, and tutorials on managing, optimizing, and protecting PDF files securely."
+          "@graph": [
+            {
+              "@type": "CollectionPage",
+              "@id": "https://seal-pdf.com/guides#collection",
+              "name": "SealPDF Guides & Technical Resources",
+              "url": "https://seal-pdf.com/guides",
+              "description": "Educational articles, guides, and tutorials on managing, optimizing, and protecting PDF files securely."
+            },
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://seal-pdf.com/" },
+                { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://seal-pdf.com/guides" }
+              ]
+            }
+          ]
         };
       } else if (path.startsWith('/guides/')) {
         const slug = path.split('/')[2];
         const guide = guidesData.find(g => g.slug === slug);
         if (guide) {
+          isKnownRoute = true;
           title = `${guide.title} | SealPDF Guides`;
           description = guide.description;
           keywords = guide.keywords;
@@ -296,55 +375,83 @@ function App() {
           const url = `https://seal-pdf.com${path}`;
           schemaData = {
             "@context": "https://schema.org",
-            "@type": "TechArticle",
-            "@id": `${url}#article`,
-            "headline": guide.title,
-            "description": guide.description,
-            "image": "https://seal-pdf.com/logo.png",
-            "author": {
-              "@type": "Organization",
-              "name": "SealPDF"
-            },
-            "publisher": {
-              "@type": "Organization",
-              "name": "SealPDF",
-              "logo": {
-                "@type": "ImageObject",
-                "url": "https://seal-pdf.com/logo.png"
+            "@graph": [
+              {
+                "@type": "TechArticle",
+                "@id": `${url}#article`,
+                "headline": guide.title,
+                "description": guide.description,
+                "image": "https://seal-pdf.com/logo.png",
+                "author": {
+                  "@type": "Organization",
+                  "name": "SealPDF"
+                },
+                "publisher": {
+                  "@type": "Organization",
+                  "name": "SealPDF",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "url": "https://seal-pdf.com/logo.png"
+                  }
+                },
+                "datePublished": "2026-07-21T00:00:00Z",
+                "dateModified": "2026-11-25T00:00:00Z",
+                "mainEntityOfPage": url
+              },
+              {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                  { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://seal-pdf.com/" },
+                  { "@type": "ListItem", "position": 2, "name": "Guides", "item": "https://seal-pdf.com/guides" },
+                  { "@type": "ListItem", "position": 3, "name": guide.title, "item": url }
+                ]
               }
-            },
-            "datePublished": "2026-07-21T00:00:00Z",
-            "mainEntityOfPage": url
+            ]
           };
         }
       } else if (path === '/help') {
+        isKnownRoute = true;
         title = "Help & Support Center | SealPDF";
         description = "Get answers to frequently asked questions about SealPDF file processing security, GDPR compliance, and tools support.";
         keywords = "help center, FAQ, support, PDF processing, local browser processing, GDPR FAQ, SealPDF support";
         
         schemaData = {
           "@context": "https://schema.org",
-          "@type": "FAQPage",
-          "@id": "https://seal-pdf.com/help#faq",
-          "mainEntity": [
+          "@graph": [
             {
-              "@type": "Question",
-              "name": "How does SealPDF process my files?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Most tools run client-side directly in your browser using JavaScript and WebAssembly. Files never leave your local device."
-              }
+              "@type": "FAQPage",
+              "@id": "https://seal-pdf.com/help#faq",
+              "mainEntity": [
+                {
+                  "@type": "Question",
+                  "name": "How does SealPDF process my files?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Most tools run client-side directly in your browser using JavaScript and WebAssembly. Files never leave your local device."
+                  }
+                },
+                {
+                  "@type": "Question",
+                  "name": "Is SealPDF GDPR compliant?",
+                  "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, we do not store files longer than required, and local tools upload nothing."
+                  }
+                }
+              ]
             },
             {
-              "@type": "Question",
-              "name": "Is SealPDF GDPR compliant?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Yes, we do not store files longer than required, and local tools upload nothing."
-              }
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://seal-pdf.com/" },
+                { "@type": "ListItem", "position": 2, "name": "Help Center", "item": "https://seal-pdf.com/help" }
+              ]
             }
           ]
         };
+      } else {
+        title = "Page Not Found | SealPDF";
+        description = "The requested page could not be found on SealPDF.";
       }
       
       // Default Website and Org schemas for non-tool pages if schemaData not set
@@ -377,6 +484,11 @@ function App() {
     // Update basic tags
     document.title = title;
     
+    const robotsMeta = document.querySelector('meta[name="robots"]');
+    if (robotsMeta) {
+      robotsMeta.setAttribute('content', isKnownRoute ? 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' : 'noindex, nofollow');
+    }
+
     const descMeta = document.querySelector('meta[name="description"]');
     if (descMeta) descMeta.setAttribute('content', description);
     
@@ -397,13 +509,13 @@ function App() {
     if (ogUrl) ogUrl.setAttribute('content', canonical);
     
     // Update Twitter tags
-    const twitterTitle = document.querySelector('meta[property="twitter:title"]');
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
     if (twitterTitle) twitterTitle.setAttribute('content', title);
     
-    const twitterDesc = document.querySelector('meta[property="twitter:description"]');
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
     if (twitterDesc) twitterDesc.setAttribute('content', description);
     
-    const twitterUrl = document.querySelector('meta[property="twitter:url"]');
+    const twitterUrl = document.querySelector('meta[name="twitter:url"]');
     if (twitterUrl) twitterUrl.setAttribute('content', canonical);
     
     // Inject JSON-LD Schema
@@ -791,33 +903,57 @@ function App() {
       </div>
 
       <main className="main-content">
-        <Routes>
-          <Route path="/" element={renderHome()} />
-          <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} />} />
-          <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} />} />
-          <Route path="/about" element={<AboutUs onBack={() => navigate('/')} />} />
-          <Route path="/contact" element={<ContactUs onBack={() => navigate('/')} />} />
-          <Route path="/guides" element={<GuidesList />} />
-          <Route path="/guides/:slug" element={<GuideDetail />} />
-          <Route path="/help" element={<HelpCenter />} />
-          <Route path="/image-to-pdf" element={<ImageToPdfTool />} /> {/* Legacy redirect mapping */}
+        <Suspense fallback={
+          <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ width: 32, height: 32, border: '3px solid #e2e8f0', borderTopColor: '#2563EB', borderRadius: '50%', animation: 'sealpdf-spin 0.75s linear infinite' }} />
+          </div>
+        }>
+          <Routes>
+            <Route path="/" element={renderHome()} />
+            <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} />} />
+            <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} />} />
+            <Route path="/about" element={<AboutUs onBack={() => navigate('/')} />} />
+            <Route path="/contact" element={<ContactUs onBack={() => navigate('/')} />} />
+            <Route path="/guides" element={<GuidesList />} />
+            <Route path="/guides/:slug" element={<GuideDetail />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/image-to-pdf" element={<Navigate to="/jpg-to-pdf" replace />} />
 
-          {allTools.map(tool => (
-            <Route
-              key={tool.path}
-              path={tool.path}
-              element={
-                <div className="tool-container">
-                  <header className="page-header">
-                    <h1>{tool.name}</h1>
-                    <p className="subtitle">{tool.desc}</p>
-                  </header>
-                  <tool.component />
+            {allTools.map(tool => (
+              <Route
+                key={tool.path}
+                path={tool.path}
+                element={
+                  <div className="tool-container">
+                    <nav aria-label="Breadcrumb" style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <Link to="/" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Home</Link>
+                      <span>/</span>
+                      <span style={{ color: 'var(--text-main)', fontWeight: 500 }}>{tool.name}</span>
+                    </nav>
+                    <header className="page-header">
+                      <h1>{tool.name}</h1>
+                      <p className="subtitle">{tool.desc}</p>
+                    </header>
+                    <tool.component />
+                  </div>
+                }
+              />
+            ))}
+
+            <Route path="*" element={
+              <div style={{ textAlign: 'center', padding: '5rem 1.5rem', maxWidth: '600px', margin: '0 auto' }}>
+                <h1 style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>404 — Page Not Found</h1>
+                <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
+                  The page you are looking for does not exist or has been moved. Explore our free browser-based PDF tools below.
+                </p>
+                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <Link to="/" className="auth-btn signup" style={{ textDecoration: 'none' }}>Go to Homepage</Link>
+                  <Link to="/guides" className="auth-btn login" style={{ textDecoration: 'none' }}>Browse Guides</Link>
                 </div>
-              }
-            />
-          ))}
-        </Routes>
+              </div>
+            } />
+          </Routes>
+        </Suspense>
       </main>
 
       <Footer />

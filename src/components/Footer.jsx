@@ -55,24 +55,10 @@ const Footer = () => {
                     </ul>
                 </div>
                 <div className="footer-col">
-                    <h4>Follow Us</h4>
-                    <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
-                        <a href="#" target="_blank" rel="noopener noreferrer" className="footer-link" aria-label="Facebook">
-                            <Facebook size={20} />
-                        </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" className="footer-link" aria-label="Twitter">
-                            <Twitter size={20} />
-                        </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" className="footer-link" aria-label="Instagram">
-                            <Instagram size={20} />
-                        </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" className="footer-link" aria-label="LinkedIn">
-                            <Linkedin size={20} />
-                        </a>
-                        <a href="#" target="_blank" rel="noopener noreferrer" className="footer-link" aria-label="GitHub">
-                            <Github size={20} />
-                        </a>
-                    </div>
+                    <h4>Privacy-First</h4>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.5, margin: 0 }}>
+                        All core PDF operations run locally in your browser via WebAssembly. Your files never leave your device.
+                    </p>
                 </div>
             </div>
             <div className="footer-bottom">

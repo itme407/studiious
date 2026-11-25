@@ -280,6 +280,13 @@ const WatermarkRemoverTool = () => {
     const canvasContainerRef = useRef(null);
 
     useEffect(() => {
+        if (!document.querySelector('script[data-opencv="true"]')) {
+            const script = document.createElement('script');
+            script.src = 'https://docs.opencv.org/4.10.0/opencv.js';
+            script.async = true;
+            script.dataset.opencv = 'true';
+            document.head.appendChild(script);
+        }
         const checkCv = setInterval(() => {
             if (window.cv && window.cv.getBuildInformation) {
                 setIsCvLoaded(true);
