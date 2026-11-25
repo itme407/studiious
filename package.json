@@ -8,7 +8,8 @@
     "build": "vite build && node scripts/prerender.mjs",
     "lint": "eslint .",
     "preview": "npm run build && wrangler dev",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "indexnow": "node scripts/submit-indexnow.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.3",

@@ -6,14 +6,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 export default defineConfig({
   plugins: [react(), VitePWA({
     registerType: 'autoUpdate',
-    includeAssets: ['favicon.ico', 'favicon.png', 'favicon-512.png', 'logo.png', 'robots.txt', 'sitemap.xml'],
+    includeAssets: ['favicon.ico', 'favicon.png', 'favicon-512.png', 'logo.png', 'robots.txt', 'sitemap.xml', '1e6ac7b58a4b4c8d858b2b012ea116cc.txt'],
     workbox: {
       navigateFallbackDenylist: [
         /^\/sitemap\.xml$/,
         /^\/robots\.txt$/,
         /^\/ads\.txt$/,
         /^\/BingSiteAuth\.xml$/,
-        /^\/googleed8f3eaef53d5729\.html$/
+        /^\/googleed8f3eaef53d5729\.html$/,
+        /^\/1e6ac7b58a4b4c8d858b2b012ea116cc\.txt$/
       ]
     },
     manifest: {
