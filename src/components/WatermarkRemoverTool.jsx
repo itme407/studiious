@@ -1235,7 +1235,7 @@ const WatermarkRemoverTool = () => {
                     {!file ? (
                         <div style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
                             <p style={{ marginBottom: '1rem' }}>
-                                Works exactly like Dpdf to strip even the most stubborn PDF watermarks:
+                                Works exactly like AI WM Remover to strip even the most stubborn PDF watermarks:
                             </p>
                             <ul style={{ paddingLeft: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                 <li><b>Rotated & Diagonal Text:</b> Strips VTU, DRAFT, CONFIDENTIAL & diagonal stamps.</li>
